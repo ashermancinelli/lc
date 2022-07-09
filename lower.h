@@ -7,4 +7,5 @@ void add_value(std::string name, Value* v);
 Value* get_value(std::string n);
 LLVMContext& context();
 IRBuilder<>& get_builder();
+Module& get_module();
 std::string lower_id();

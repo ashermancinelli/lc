@@ -207,7 +207,7 @@ std::shared_ptr<SEXPR> parse_sexpr()
   eat(TOK_LPAREN);
   int  ti = tok_next(), ei = -1;
   TOK  tt;
-  auto se = std::make_shared<SEXPR>();
+  auto se = std::make_shared<SEXPR>(TOKI(ti).offset);
 
   while((tt = TOKI(ti).t) != TOK_RPAREN)
   {
@@ -483,33 +483,4 @@ FILE* preproc(FILE* istream)
 
   rewind(iostream);
   return iostream;
-}
-
-Value* SEXPR::codegen()
-{
-  if (dump("lower"))
-    puts("lowering SEXPR");
-  if (auto f = dynamic_pointer_cast<BIFUNC>(exprs[0]))
-  {
-    if (dump("lower"))
-      puts("lowering BIFUNC from SEXPR");
-    return f->codegen();
-  }
-  else
-    return exprs[0]->codegen();
-}
-
-Value* NUM::codegen()
-{
-  if (dump("lower"))
-    puts("lowering NUM");
-  return ConstantFP::get(context(), APFloat((double)this->v));
-}
-
-Value* ID::codegen()
-{
-  if (dump("lower"))
-    puts("lowering ID");
-  Value* v = get_value(this->n);
-  return v;
 }

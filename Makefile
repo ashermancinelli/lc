@@ -2,6 +2,7 @@ BUILD			 = build
 OBJ    		 = $(patsubst %.c,%.o,$(wildcard *.cpp))
 TESTS  		 = $(wildcard t/*.lisp)
 LLVM   		 = $(shell llvm-config  --cxxflags --ldflags --libs core)
+CXX				 ?= clang++
 
 # Size of the expression table
 EXPRSZ 		 ?= 1024
@@ -18,7 +19,7 @@ CFLAGS 		 = -DEXPRSZ=$(EXPRSZ) -DROOTEXPRSZ=$(ROOTEXPRSZ) -DTOKSZ=$(TOKSZ) \
 						 -DMAXFILESZ=$(MAXFILESZ) -g
 
 LDFLAGS 	 = $(LLVM)
-CXFLAGS 	 = $(LLVM) -std=c++20
+CXFLAGS 	 = $(LLVM) -std=c++20 -Wno-switch
 
 all: $(OBJ)
 	$(CXX) $(OBJ) $(CFLAGS) $(LDFLAGS) $(CXFLAGS) -o lc

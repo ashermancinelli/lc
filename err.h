@@ -16,9 +16,11 @@ struct LC_MSG
   int         offset = -1;
 };
 
-#define LCASSERT(msg, cond) \
-  if(!(cond))               \
-    reg_msg(LC_MSG{"ICE", msg, MSG_FATAL});
+#define LCASSERT_P(ph, msg, cond) \
+  if(!(cond))                     \
+    reg_msg(LC_MSG{ph, msg, MSG_FATAL});
+
+#define LCASSERT(msg, cond) LCASSERT_P("internal compiler error", msg, (cond));
 
 void reg_msg(LC_MSG err);
 void err_printer();

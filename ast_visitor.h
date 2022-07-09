@@ -16,20 +16,36 @@ struct VISITOR
   }
 };
 
-inline void expr_visit(std::shared_ptr<EXPR> e, std::shared_ptr<VISITOR> v)
+inline bool expr_visit(std::shared_ptr<EXPR> e, std::shared_ptr<VISITOR> v)
 {
+  bool changed = false;
   if(auto ee = std::dynamic_pointer_cast<SEXPR>(e))
   {
-    v->visitSEXPR(ee);
+    changed = changed || v->visitSEXPR(ee);
     for(auto const se : ee->exprs)
-      expr_visit(se, v);
+      changed = changed || expr_visit(se, v);
+  }
+  else if (auto f = std::dynamic_pointer_cast<USERFUNC>(e))
+  {
+    changed = changed || v->visitSEXPR(f->body);
   }
   else if(auto ee = std::dynamic_pointer_cast<ID>(e))
   {
-    v->visitID(ee);
+    changed = changed || v->visitID(ee);
   }
   else if(auto ee = std::dynamic_pointer_cast<STR>(e))
   {
-    v->visitSTR(ee);
+    changed = changed || v->visitSTR(ee);
   }
+  else if(auto ee = std::dynamic_pointer_cast<BISUM>(e))
+  {
+    changed = changed || expr_visit(ee->lhs, v);
+    changed = changed || expr_visit(ee->rhs, v);
+  }
+  else if(auto ee = std::dynamic_pointer_cast<BIMUL>(e))
+  {
+    changed = changed || expr_visit(ee->lhs, v);
+    changed = changed || expr_visit(ee->rhs, v);
+  }
+  return changed;
 }

@@ -47,7 +47,7 @@ void err_printer()
       int col = e.offset - last_offset;
       int linelen = strlen(line);
       line[linelen-1] = 0;
-      printf("\n%s:%d:%d:\n%s\n", infile().c_str(), lineno, col, line);
+      printf("\n%s:%zu:%d:\n%s\n", infile().c_str(), lineno, col, line);
       for (int i=0; i < col-1; i++)
         printf("~");
       printf("^");
