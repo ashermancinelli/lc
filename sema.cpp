@@ -63,14 +63,18 @@ struct replace_builtins : public VISITOR
       }
       else if(id->n == "defun")
       {
-        LCASSERT_P("sema", "defun requires a prototype and a body", se->exprs.size() == 3);
+        LCASSERT_P("sema", "defun requires a prototype and a body", se->exprs.size() >= 3);
 
         auto ps = std::dynamic_pointer_cast<SEXPR>(se->exprs[1]);
         LCASSERT_P("sema", "defun prototype must be a sexpr", ps);
         auto proto = std::make_shared<PROTOTYPE>(ps);
 
-        auto body = std::dynamic_pointer_cast<SEXPR>(se->exprs[2]);
-        LCASSERT_P("sema", "defun body must be a sexpr", body);
+        std::vector<std::shared_ptr<SEXPR>> body;
+        for(int i = 2; i < se->exprs.size(); i++)
+        {
+          body.push_back(std::dynamic_pointer_cast<SEXPR>(se->exprs[i]));
+          LCASSERT_P("sema", "defun body must be a sexpr", body.back());
+        }
 
         auto f       = std::make_shared<USERFUNC>(proto, body);
         se->exprs[0] = f;
@@ -91,7 +95,10 @@ struct replace_builtins : public VISITOR
     }
     return false;
   }
-  bool visitID(std::shared_ptr<ID> id) override { return false; }
+  bool visitID(std::shared_ptr<ID> id) override
+  {
+    return false;
+  }
 };
 
 void sema_builtins(std::shared_ptr<MODULE> m)
@@ -103,6 +110,6 @@ again:
     anychanged = anychanged or expr_visit(m->sexprs[i], std::make_shared<replace_builtins>());
   }
   // Continue visiting until nothing has changed
-  if (anychanged)
+  if(anychanged)
     goto again;
 }

@@ -18,8 +18,8 @@ MAXFILESZ  ?= 4096
 CFLAGS 		 = -DEXPRSZ=$(EXPRSZ) -DROOTEXPRSZ=$(ROOTEXPRSZ) -DTOKSZ=$(TOKSZ) \
 						 -DMAXFILESZ=$(MAXFILESZ) -g
 
-LDFLAGS 	 = $(LLVM)
-CXFLAGS 	 = $(LLVM) -std=c++20 -Wno-switch
+LDFLAGS 	 = $(LLVM) -luuid
+CXFLAGS 	 = $(LLVM) -std=c++20 -Wno-switch -Wno-write-strings
 
 all: $(OBJ)
 	$(CXX) $(OBJ) $(CFLAGS) $(LDFLAGS) $(CXFLAGS) -o lc

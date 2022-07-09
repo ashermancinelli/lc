@@ -16,3 +16,13 @@ bool info();
 bool repl();
 std::string outfile();
 std::string infile();
+std::string llvmroot();
+std::string optlevel();
+
+enum class ARCH {
+  LLVM,
+  ASM,
+  NATIVE,
+};
+
+ARCH arch();

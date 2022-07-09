@@ -63,9 +63,16 @@ void add_print()
                                           PointerType::get(Type::getInt8Ty(context()), 0), true));
 }
 
+void add_puts()
+{
+  module->getOrInsertFunction("puts", FunctionType::get(IntegerType::getInt8PtrTy(context()),
+                                        PointerType::get(Type::getInt8Ty(context()), 0), true));
+}
+
 void add_builtins()
 {
   add_print();
+  add_puts();
 }
 
 void lower(std::shared_ptr<MODULE> m)
@@ -89,15 +96,4 @@ void lower(std::shared_ptr<MODULE> m)
   builder->SetInsertPoint(bb);
   auto* ret = builder->CreateFPToSI(v, IntegerType::get(*ctx, 8), "return");
   builder->CreateRet(ret);
-  if(outfile().size())
-  {
-    std::error_code ec;
-    raw_fd_ostream  os{outfile(), ec};
-    if(ec)
-      reg_msg(LC_MSG{"lower", "could not open output file for writing", MSG_FATAL});
-    else
-      module->print(os, nullptr);
-  }
-  else
-    module->print(errs(), nullptr);
 }

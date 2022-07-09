@@ -114,8 +114,8 @@ struct BISUM : public BIFUNC
   {
     INDENT(indent);
     puts("+");
-    lhs->print(indent+1);
-    rhs->print(indent+1);
+    lhs->print(indent + 1);
+    rhs->print(indent + 1);
   }
   Value* codegen() override;
 };
@@ -193,8 +193,8 @@ struct USERFUNC : public EXPR
 {
   static std::map<std::string, Value*> local_values;
   std::shared_ptr<PROTOTYPE>           proto;
-  std::shared_ptr<SEXPR>               body;
-  USERFUNC(std::shared_ptr<PROTOTYPE> p, std::shared_ptr<SEXPR> b, int offset = -1)
+  std::vector<std::shared_ptr<SEXPR>>  body;
+  USERFUNC(std::shared_ptr<PROTOTYPE> p, std::vector<std::shared_ptr<SEXPR>> b, int offset = -1)
       : proto(p)
       , body(b)
       , EXPR(offset)
@@ -207,7 +207,8 @@ struct USERFUNC : public EXPR
     proto->print(indent + 1);
     INDENT(indent + 1);
     puts("body:");
-    body->print(indent + 2);
+    for (auto b : body)
+      b->print(indent + 2);
   }
   Value* codegen() override;
 };

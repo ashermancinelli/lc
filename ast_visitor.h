@@ -27,7 +27,8 @@ inline bool expr_visit(std::shared_ptr<EXPR> e, std::shared_ptr<VISITOR> v)
   }
   else if (auto f = std::dynamic_pointer_cast<USERFUNC>(e))
   {
-    changed = changed || v->visitSEXPR(f->body);
+    for (auto b : f->body)
+      changed = changed || v->visitSEXPR(b);
   }
   else if(auto ee = std::dynamic_pointer_cast<ID>(e))
   {
