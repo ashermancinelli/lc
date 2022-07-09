@@ -14,6 +14,7 @@ bool dump(std::string_view sv);
 bool debug(std::string_view sv);
 bool info();
 bool repl();
+bool syntaxonly();
 std::string outfile();
 std::string infile();
 std::string llvmroot();

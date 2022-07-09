@@ -207,6 +207,9 @@ int main(int argc, char **argv) {
     m->print(0);
   }
 
+  if (syntaxonly())
+    goto cleanup;
+
   lower(m);
 
   switch (arch()) {
@@ -221,6 +224,7 @@ int main(int argc, char **argv) {
     break;
   }
 
+cleanup:
   if (any_errors())
     std::exit(EXIT_FAILURE);
 
