@@ -172,3 +172,8 @@ Value* BIDEFVAR::codegen()
   add_value(id, v->codegen());
   return get_value(id);
 }
+
+Value* STR::codegen()
+{
+  return get_builder().CreateGlobalStringPtr(this->s, "str" + lower_id());
+}

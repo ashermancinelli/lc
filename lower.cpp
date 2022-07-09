@@ -57,11 +57,25 @@ void add_value(std::string name, Value* v)
   named_values[name] = v;
 }
 
+void add_print()
+{
+  module->getOrInsertFunction("printf", FunctionType::get(IntegerType::getInt8PtrTy(context()),
+                                          PointerType::get(Type::getInt8Ty(context()), 0), true));
+}
+
+void add_builtins()
+{
+  add_print();
+}
+
 void lower(std::shared_ptr<MODULE> m)
 {
   ctx     = std::make_unique<LLVMContext>();
   module  = std::make_unique<Module>("lisp compiler", *ctx);
   builder = std::make_unique<IRBuilder<>>(*ctx);
+
+  add_builtins();
+
   m->codegen_funcs();
 
   std::vector<Type*> entrypoint;

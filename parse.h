@@ -70,10 +70,7 @@ struct STR : public EXPR
     INDENT(indent);
     printf("\"%s\"\n", s.c_str());
   }
-  Value* codegen() override
-  {
-    return nullptr;
-  }
+  Value* codegen() override;
 };
 
 struct BIFUNC : public EXPR

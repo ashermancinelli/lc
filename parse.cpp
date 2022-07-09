@@ -116,61 +116,6 @@ std::shared_ptr<EXPR> parse_expr()
   }
 }
 
-/*
-void dump_opc_i(int exp, int indent)
-{
-#define INDENT()                  \
-  for(int i = 0; i < indent; i++) \
-    printf("  ");
-
-  EXPR e = EXPRI(exp);
-
-  switch(e.opc)
-  {
-#define OPC_PROC(O) \
-  case O:           \
-    printf(#O ":"); \
-    break;
-#include "opc.def"
-#undef OPC_PROC
-  }
-
-  switch(e.opc)
-  {
-  case OP_ST:
-    printf("%s", e.val.s);
-    puts("");
-    dump_opc_i(e.next, indent + 1);
-    break;
-  case OP_SEXPR:
-    printf("%s", e.val.s);
-    puts("");
-    dump_opc_i(e.next, indent + 1);
-    break;
-  case OP_LD:
-    printf("%s", e.val.s);
-    break;
-  case OP_NUM:
-    printf("%d", e.val.i);
-    break;
-  case OP_STR:
-    printf("%s", e.val.s);
-    break;
-  }
-  puts("");
-#undef INDENT
-}
-
-void dump_opc_table()
-{
-  for(int i = 0; i < root_expr_it; i++)
-  {
-    // int e = root_exprs[i];
-    // dump_opc_i(e, 0);
-  }
-}
-*/
-
 static void eat(TOK t)
 {
   int ti = tok_next();
