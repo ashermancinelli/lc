@@ -1,0 +1,2 @@
+KEYWORD_PROC(defvar)
+KEYWORD_PROC(let)
