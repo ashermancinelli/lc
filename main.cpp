@@ -56,7 +56,8 @@ std::string suuid() {
   return std::string(id);
 }
 
-void emit_asm() {
+std::string gen_llvm()
+{
   char tmpfile[1024];
   sprintf(tmpfile, "/tmp/lc-llvm-%s.ll", suuid().c_str());
 
@@ -69,6 +70,11 @@ void emit_asm() {
     reg_msg(LC_MSG{"asm", "could not open output file for writing", MSG_FATAL});
   else
     get_module().print(os, nullptr);
+  return std::string(tmpfile);
+}
+
+void emit_asm() {
+  std::string tmpfile = gen_llvm();
 
   std::string of;
   if ((of = outfile()) == "") {
@@ -87,7 +93,7 @@ void emit_asm() {
     auto ol = optlevel();
     char *const argv[] = {clang.data(), "-Wno-override-module",
                           ol.data(),    "-S",
-                          tmpfile,      "-o",
+                          tmpfile.data(),      "-o",
                           of.data(),    NULL};
     if (info()) {
       puts("exec'ing the following command:");
@@ -111,19 +117,7 @@ void emit_asm() {
 }
 
 void emit_native() {
-  char tmpfile[1024];
-  sprintf(tmpfile, "/tmp/lc-llvm-%s.ll", suuid().c_str());
-
-  if (info())
-    printf("writing llvm ir to temporary file %s\n", tmpfile);
-
-  std::error_code ec;
-  raw_fd_ostream os{tmpfile, ec};
-  if (ec)
-    reg_msg(
-        LC_MSG{"native", "could not open output file for writing", MSG_FATAL});
-  else
-    get_module().print(os, nullptr);
+  auto tmpfile = gen_llvm();
 
   std::string of;
   if ((of = outfile()) == "") {
@@ -141,7 +135,7 @@ void emit_native() {
     auto clang = llvmroot() + "/bin/clang";
     auto ol = optlevel();
     char *const argv[] = {clang.data(), "-Wno-override-module",
-                          ol.data(),    tmpfile,
+                          ol.data(),    tmpfile.data(),
                           "-o",         of.data(),
                           NULL};
     if (info()) {
@@ -163,6 +157,34 @@ void emit_native() {
     sprintf(msg, "clang native generation failed");
     reg_msg(LC_MSG{"asm", msg, MSG_FATAL});
   }
+}
+
+void interpret()
+{
+  auto tmpfile = gen_llvm();
+
+  pid_t pid;
+  pid = fork();
+
+  if (pid == 0) // child interprets llvm ir
+  {
+    auto lli = llvmroot() + "/bin/lli";
+    auto ol = optlevel();
+    char *const argv[] = {lli.data(), tmpfile.data(), NULL};
+    if (info()) {
+      puts("exec'ing the following command:");
+      int i = 0;
+      while (argv[i] != NULL) {
+        printf("%s ", argv[i++]);
+      }
+      puts("");
+    }
+    execv(argv[0], argv);
+    std::exit(0);
+  }
+
+  while (wait(NULL) > 0)
+    ;
 }
 
 int main(int argc, char **argv) {
@@ -212,15 +234,18 @@ int main(int argc, char **argv) {
 
   lower(m);
 
-  switch (arch()) {
-  case ARCH::LLVM:
+  switch (target()) {
+  case TARGET::LLVM:
     emit_llvm();
     break;
-  case ARCH::ASM:
+  case TARGET::ASM:
     emit_asm();
     break;
-  case ARCH::NATIVE:
+  case TARGET::NATIVE:
     emit_native();
+    break;
+  case TARGET::INTERPRET:
+    interpret();
     break;
   }
 

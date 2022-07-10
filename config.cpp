@@ -7,9 +7,11 @@ void help() {
   puts("lc: help");
   puts("-o");
   puts("\t\tfile compiler output will be written to");
-  puts("-arch <arch>");
-  puts("\t\tarchitecture output type. Valid values are:");
-  puts("\t\t\tllvm (default), asm, native");
+  puts("-target <target>");
+  puts("\t\ttarget output type. Valid values are:");
+  puts("\t\t\tinterpret (default), llvm, asm, native");
+  puts("\t\tnote: this implies only temporary files will be generated and the ");
+  puts("\t\t-o argument will be ignored if used.");
   puts("-fdump-<phase>");
   puts("\t\tdump all info from phase <phase>");
   puts("\t\tpossible phases include:");
@@ -33,7 +35,7 @@ static struct {
   bool info = false;
   bool repl = false;
   bool syntaxonly = false;
-  ARCH arch = ARCH::LLVM;
+  TARGET target = TARGET::INTERPRET;
 } opts;
 
 void parse_opts(int argc, char **argv) {
@@ -60,26 +62,30 @@ void parse_opts(int argc, char **argv) {
         std::exit(EXIT_FAILURE);
       }
       opts.llvmroot = *it;
+    } else if (*it == "-i" or *it == "-interpret") {
+      opts.target = TARGET::INTERPRET;
     } else if ((*it).starts_with("-O")) {
       opts.lvl = *it;
-    } else if (*it == "-arch") {
+    } else if (*it == "-target") {
       it++;
       if (it == args.end()) {
-        puts("option '-arch' requires an argument");
+        puts("option '-target' requires an argument");
         std::exit(EXIT_FAILURE);
       }
-      std::string arch = *it;
-      std::transform(arch.begin(), arch.end(), arch.begin(),
+      std::string target = *it;
+      std::transform(target.begin(), target.end(), target.begin(),
                      [](char c) { return std::tolower(c); });
-      if (arch == "asm")
-        opts.arch = ARCH::ASM;
-      else if (arch == "llvm")
-        opts.arch = ARCH::LLVM;
-      else if (arch == "native")
-        opts.arch = ARCH::NATIVE;
+      if (target == "asm")
+        opts.target = TARGET::ASM;
+      else if (target == "llvm")
+        opts.target = TARGET::LLVM;
+      else if (target == "native")
+        opts.target = TARGET::NATIVE;
+      else if (target == "interpret")
+        opts.target = TARGET::INTERPRET;
       else {
         std::string err =
-            "expected -arch to be one of llvm, asm, or native, but got " + arch;
+            "expected -target to be one of llvm, asm, or native, but got " + target;
         printf("%s\n", err.c_str());
         std::exit(EXIT_FAILURE);
       }
@@ -130,4 +136,4 @@ std::string llvmroot() { return opts.llvmroot; }
 
 std::string optlevel() { return opts.lvl; }
 
-ARCH arch() { return opts.arch; }
+TARGET target() { return opts.target; }

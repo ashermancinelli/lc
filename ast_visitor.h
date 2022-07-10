@@ -25,6 +25,10 @@ inline bool expr_visit(std::shared_ptr<EXPR> e, std::shared_ptr<VISITOR> v)
     for(auto const se : ee->exprs)
       changed = changed || expr_visit(se, v);
   }
+  else if (auto dv = std::dynamic_pointer_cast<BIDEFVAR>(e))
+  {
+    changed = changed || expr_visit(dv->v, v);
+  }
   else if (auto f = std::dynamic_pointer_cast<USERFUNC>(e))
   {
     for (auto b : f->body)
@@ -47,6 +51,11 @@ inline bool expr_visit(std::shared_ptr<EXPR> e, std::shared_ptr<VISITOR> v)
   {
     changed = changed || expr_visit(ee->lhs, v);
     changed = changed || expr_visit(ee->rhs, v);
+  }
+  else if (auto ce = std::dynamic_pointer_cast<CALLEXPR>(e))
+  {
+    for (auto arg : ce->args)
+      changed = changed || expr_visit(arg, v);
   }
   return changed;
 }

@@ -8,4 +8,7 @@
 
 ; Use it down here, see if the modified value is actually returned
 ; Should be 10
-(+ a b)
+(printf "calculated value %f" a)
+(puts "")
+
+(0)

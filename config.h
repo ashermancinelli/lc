@@ -20,10 +20,11 @@ std::string infile();
 std::string llvmroot();
 std::string optlevel();
 
-enum class ARCH {
+enum class TARGET {
   LLVM,
   ASM,
   NATIVE,
+  INTERPRET,
 };
 
-ARCH arch();
+TARGET target();
